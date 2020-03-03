@@ -314,37 +314,6 @@
 <p>上面代码将在浏览器中渲染成：</p>
 <figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;ul <span class="keyword">class</span>=<span class="string">"students"</span>&gt;</span><br><span class="line">    &lt;<span class="keyword">li</span> <span class="keyword">class</span>=<span class="string">"student"</span>&gt;bob&lt;/<span class="keyword">li</span>&gt;</span><br><span class="line">    &lt;<span class="keyword">li</span> <span class="keyword">class</span>=<span class="string">"student"</span>&gt;rose&lt;/<span class="keyword">li</span>&gt;</span><br><span class="line">  &lt;/ul&gt;</span><br></pre></td></tr></table></figure>
 
-<h1 id="全局前置守卫"><a href="#全局前置守卫" class="headerlink" title="全局前置守卫"></a>全局前置守卫</h1><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> router = <span class="keyword">new</span> VueRouter(&#123; ... &#125;)</span><br><span class="line"></span><br><span class="line">router.beforeEach(<span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>这段代码一般是应用在main.js中，</p>
-<p>beforeEach钩子是在路由变化前做处理，该方法一共有三个参数，to，from，next。<br>参数的语义比较明显，to是即将要去往的路由，from是即将离开的路由，而next相当于一个关卡守卫，需要调用这个守卫（也就是守卫统一放行，哈哈）来resolve这个钩子。</p>
-<p>要注意的是，next可以接收不同的参数：<br>next()表示放行，顺利进入下一个路由。<br>next(false)表示阻止，无法进入下一个路由，操作被中断。<br>next(‘/‘)表示中断当前的导航，进入另外的目标路由。<br>next(error),如果传入 next 的参数是一个 Error 实例，则导航会被终止且该错误会被传递给 router.onError() 注册过的回调。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">router.afterEach(<span class="function">(<span class="params">to, <span class="keyword">from</span></span>) =&gt;</span> &#123;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>afterEach与beforeEach类似，不过afterEach是导航已经到达目标路由后的钩子。需要注意的是，afterEach没有next方法。</p>
-<h1 id="路由守卫"><a href="#路由守卫" class="headerlink" title="路由守卫"></a>路由守卫</h1><p>你可以在路由配置上直接定义 beforeEnter 守卫：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> router = <span class="keyword">new</span> VueRouter(&#123;</span><br><span class="line">         routes: [</span><br><span class="line">    &#123;</span><br><span class="line">      path: <span class="string">'/foo'</span>,</span><br><span class="line">      component: Foo,</span><br><span class="line">      beforeEnter: <span class="function">(<span class="params">to, <span class="keyword">from</span>, next</span>) =&gt;</span> &#123;</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
-
-<p>这些守卫与全局前置守卫的方法参数是一样的。</p>
-<h1 id="组件守卫"><a href="#组件守卫" class="headerlink" title="组件守卫"></a>组件守卫</h1><figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">const Foo = &#123;</span><br><span class="line">  template: `...`,</span><br><span class="line">  beforeRouteEnter (to, <span class="keyword">from</span>, <span class="built_in">next</span>) &#123;</span><br><span class="line">    <span class="comment">// 在渲染该组件的对应路由被 confirm 前调用</span></span><br><span class="line">    <span class="comment">// 不！能！获取组件实例 `this`</span></span><br><span class="line">    <span class="comment">// 因为当守卫执行前，组件实例还没被创建</span></span><br><span class="line">  &#125;,</span><br><span class="line">  beforeRouteUpdate (to, <span class="keyword">from</span>, <span class="built_in">next</span>) &#123;</span><br><span class="line">    <span class="comment">// 在当前路由改变，但是该组件被复用时调用</span></span><br><span class="line">    <span class="comment">// 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，</span></span><br><span class="line">    <span class="comment">// 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。</span></span><br><span class="line">    <span class="comment">// 可以访问组件实例 `this`</span></span><br><span class="line">  &#125;,</span><br><span class="line">  beforeRouteLeave (to, <span class="keyword">from</span>, <span class="built_in">next</span>) &#123;</span><br><span class="line">    <span class="comment">// 导航离开该组件的对应路由时调用</span></span><br><span class="line">    <span class="comment">// 可以访问组件实例 `this`</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>需要注意是beforeRouteEnter 守卫 不能 访问 this，因为守卫在导航确认前被调用,因此即将登场的新组件还没被创建。</p>
-<hr>
-<h1 id="完整的导航流程（官方）"><a href="#完整的导航流程（官方）" class="headerlink" title="完整的导航流程（官方）"></a>完整的导航流程（官方）</h1><ol>
-<li>导航被触发。</li>
-<li>在失活的组件里调用离开守卫。</li>
-<li>调用全局的 beforeEach 守卫。</li>
-<li>在重用的组件里调用 beforeRouteUpdate 守卫 (2.2+)。</li>
-<li>在路由配置里调用 beforeEnter。</li>
-<li>解析异步路由组件。</li>
-<li>在被激活的组件里调用 beforeRouteEnter。</li>
-<li>调用全局的 beforeResolve 守卫 (2.5+)。</li>
-<li>导航被确认。</li>
-<li>调用全局的 afterEach 钩子。</li>
-<li>触发 DOM 更新。</li>
-<li>用创建好的实例调用 beforeRouteEnter 守卫中传给 next 的回调函数。</li>
-</ol>
-
           
         
       
